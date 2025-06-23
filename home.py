@@ -75,11 +75,14 @@ def covers():
     sp = spotipy.Spotify(auth=token_info['access_token'])
     results = sp.search(q='This Charming Man', type='track')
     tracks = results['tracks']['items']
-    data = [
-        {
-            'spotify_url': track['external_urls']['spotify'],
-            'artist': track['artists'][0]['name']
-        }
-        for track in tracks
-    ]
+    seen_artists = set()
+    data = []
+    for track in tracks:
+        artist = track['artists'][0]['name']
+        if artist not in seen_artists:
+            seen_artists.add(artist)
+            data.append({
+                'spotify_url': track['external_urls']['spotify'],
+                'artist': artist
+            })
     return jsonify({'tracks': data})
