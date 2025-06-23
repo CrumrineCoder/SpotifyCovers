@@ -37,13 +37,17 @@ def callback():
     session['token_info'] = token_info
     return redirect(url_for('liked_songs'))
 
+# http://127.0.0.1:5000/liked-songs?page=2
 @app.route('/liked-songs')
 def liked_songs():
     token_info = session.get('token_info', None)
     if not token_info:
         return redirect(url_for('login'))
     sp = spotipy.Spotify(auth=token_info['access_token'])
-    results = sp.current_user_saved_tracks(limit=50)
+    page = int(request.args.get('page', 0))
+    limit = 10
+    offset = page * limit
+    results = sp.current_user_saved_tracks(limit=limit, offset=offset)
     songs = [
         {
             'name': item['track']['name'],
@@ -51,4 +55,10 @@ def liked_songs():
         }
         for item in results['items']
     ]
-    return {'liked_songs': songs}
+    return {
+        'liked_songs': songs,
+        'page': page,
+        'total': results['total'],
+        'has_next': offset + limit < results['total'],
+        'has_prev': page > 0
+    }
