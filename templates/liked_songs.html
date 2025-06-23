@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Liked Songs</title>
+</head>
+<body>
+    <h1>Liked Songs (Page {{ page }})</h1>
+    <ul>
+    {% for song in songs %}
+        <li>{{ song.name }} by {{ song.artist }}</li>
+    {% endfor %}
+    </ul>
+    <div>
+        {% if has_prev %}
+            <a href="{{ url_for('liked_songs', page=page-1) }}"><button>Previous</button></a>
+        {% else %}
+            <button disabled>Previous</button>
+        {% endif %}
+        {% if has_next %}
+            <a href="{{ url_for('liked_songs', page=page+1) }}"><button>Next</button></a>
+        {% else %}
+            <button disabled>Next</button>
+        {% endif %}
+    </div>
+</body>
+</html>

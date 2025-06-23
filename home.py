@@ -1,4 +1,5 @@
-from flask import Flask, redirect, request, session, url_for
+from flask import Flask, redirect, request, session, url_for, render_template
+
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
@@ -55,10 +56,13 @@ def liked_songs():
         }
         for item in results['items']
     ]
-    return {
-        'liked_songs': songs,
-        'page': page,
-        'total': results['total'],
-        'has_next': offset + limit < results['total'],
-        'has_prev': page > 0
-    }
+    total = results['total']
+    has_next = offset + limit < total
+    has_prev = page > 0
+    return render_template(
+        'liked_songs.html',
+        songs=songs,
+        page=page,
+        has_next=has_next,
+        has_prev=has_prev
+    )
