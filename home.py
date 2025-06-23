@@ -1,4 +1,4 @@
-from flask import Flask, redirect, request, session, url_for, render_template
+from flask import Flask, redirect, request, session, url_for, render_template, jsonify
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -66,3 +66,14 @@ def liked_songs():
         has_next=has_next,
         has_prev=has_prev
     )
+
+@app.route("/covers")
+def covers():
+    token_info = session.get('token_info', None)
+    if not token_info:
+        return redirect(url_for('login'))
+    sp = spotipy.Spotify(auth=token_info['access_token'])
+    results = sp.search(q='This Charming Man', type='track')
+    tracks = results['tracks']['items']
+    urls = [track['external_urls']['spotify'] for track in tracks]
+    return jsonify({'spotify_urls': urls})

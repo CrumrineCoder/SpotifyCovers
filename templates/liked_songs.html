@@ -9,6 +9,7 @@
     {% for song in songs %}
         <li>{{ song.name }} by {{ song.artist }}</li>
     {% endfor %}
+         <a href="{{ url_for('covers') }}"><button>Find Covers</button></a>
     </ul>
     <div>
         {% if has_prev %}
