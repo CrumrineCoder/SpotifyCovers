@@ -70,7 +70,7 @@ def liked_songs():
             data = []
             for track in cover_tracks:
                 artist = track['artists'][0]['name']
-                if artist not in seen_artists:
+                if artist not in seen_artists and artist != song["artist"] and track['name'] == song['name']:
                     seen_artists.add(artist)
                     data.append({
                         "name": track['name'],
@@ -81,7 +81,6 @@ def liked_songs():
         return all_data
 
     cover_songs = process_liked_songs(songs)
-    print(cover_songs)
 
     return render_template(
         'liked_songs.html',
