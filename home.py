@@ -47,7 +47,7 @@ def liked_songs():
     sp = spotipy.Spotify(auth=token_info['access_token'])
 
     page = int(request.args.get('page', 0))
-    limit = 10
+    limit = 50
     offset = page * limit
     results = sp.current_user_saved_tracks(limit=limit, offset=offset)
     songs = [
