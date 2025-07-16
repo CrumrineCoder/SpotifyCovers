@@ -61,36 +61,34 @@ def liked_songs():
     has_next = offset + limit < total
     has_prev = page > 0
 
-    def process_liked_songs(songs_to_process):
-        all_data = []
-        for song in songs_to_process:
-            covers_results = sp.search(q=song['name'], type='track')
-            cover_tracks = covers_results['tracks']['items']
-            seen_artists = set()
-            data = []
-            for track in cover_tracks:
-                artist = track['artists'][0]['name']
-                if artist not in seen_artists and artist != song["artist"] and track['name'] == song['name']:
-                    seen_artists.add(artist)
-                    data.append({
-                        "name": track['name'],
-                        'spotify_url': track['external_urls']['spotify'],
-                        'artist': artist
-                    })
-            all_data.extend(data)
-        return all_data
-
-    cover_songs = process_liked_songs(songs)
+    songs_with_covers = []
+    for song in songs:
+        covers_results = sp.search(q=song['name'], type='track')
+        cover_tracks = covers_results['tracks']['items']
+        seen_artists = set()
+        covers = []
+        for track in cover_tracks:
+            artist = track['artists'][0]['name']
+            if artist not in seen_artists and artist != song["artist"] and track['name'] == song['name']:
+                seen_artists.add(artist)
+                covers.append({
+                    "name": track['name'],
+                    'spotify_url': track['external_urls']['spotify'],
+                    'artist': artist
+                })
+        songs_with_covers.append({
+            'name': song['name'],
+            'artist': song['artist'],
+            'covers': covers
+        })
 
     return render_template(
         'liked_songs.html',
-        songs=songs,
-        cover_songs=cover_songs,
+        songs_with_covers=songs_with_covers,
         page=page,
         has_next=has_next,
         has_prev=has_prev
     )
-
 @app.route("/covers")
 def covers():
     token_info = session.get('token_info', None)
