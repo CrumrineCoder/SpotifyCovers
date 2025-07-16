@@ -45,6 +45,7 @@ def liked_songs():
     if not token_info:
         return redirect(url_for('login'))
     sp = spotipy.Spotify(auth=token_info['access_token'])
+
     page = int(request.args.get('page', 0))
     limit = 10
     offset = page * limit
@@ -59,9 +60,31 @@ def liked_songs():
     total = results['total']
     has_next = offset + limit < total
     has_prev = page > 0
+
+    def process_liked_songs(songs_to_process):
+        all_data = []
+        for song in songs_to_process:
+            covers_results = sp.search(q=song['name'], type='track')
+            cover_tracks = covers_results['tracks']['items']
+            seen_artists = set()
+            data = []
+            for track in cover_tracks:
+                artist = track['artists'][0]['name']
+                if artist not in seen_artists:
+                    seen_artists.add(artist)
+                    data.append({
+                        'spotify_url': track['external_urls']['spotify'],
+                        'artist': artist
+                    })
+            all_data.extend(data)
+        return all_data  # Return list, not jsonify
+
+    cover_songs = process_liked_songs(songs)
+
     return render_template(
         'liked_songs.html',
         songs=songs,
+        cover_songs=cover_songs,
         page=page,
         has_next=has_next,
         has_prev=has_prev
