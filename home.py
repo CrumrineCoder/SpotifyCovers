@@ -73,13 +73,15 @@ def liked_songs():
                 if artist not in seen_artists:
                     seen_artists.add(artist)
                     data.append({
+                        "name": track['name'],
                         'spotify_url': track['external_urls']['spotify'],
                         'artist': artist
                     })
             all_data.extend(data)
-        return all_data  # Return list, not jsonify
+        return all_data
 
     cover_songs = process_liked_songs(songs)
+    print(cover_songs)
 
     return render_template(
         'liked_songs.html',
